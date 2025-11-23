@@ -109,6 +109,42 @@
             justify-content: space-between;
             align-items: center;
         }
+
+        .bottom-bar {
+            position: fixed;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 9999px;
+            padding: 6px 10px;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.35);
+            z-index: 1100;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .bottom-bar button {
+            width: 40px;
+            height: 40px;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+            color: #111827;
+            border: none;
+        }
+
+        .bottom-bar button:active {
+            transform: scale(0.95);
+        }
+
+        .bottom-bar button.primary {
+            background: #4f46e5;
+            color: #ffffff;
+        }
         
         @media (min-width: 768px) {
             .tool-panel {
@@ -231,6 +267,28 @@
             </div>
         </div>
     </div>
+
+    <!-- Compact Bottom Bar -->
+    <div class="bottom-bar">
+        <button class="primary" onclick="startDrawing('polygon')" title="Draw polygon">
+            <i class="fas fa-draw-polygon"></i>
+        </button>
+        <button onclick="startDrawing('polyline')" title="Draw line">
+            <i class="fas fa-route"></i>
+        </button>
+        <button onclick="startDrawing('marker')" title="Add marker">
+            <i class="fas fa-map-marker-alt"></i>
+        </button>
+        <button onclick="startDrawing('circle')" title="Draw circle">
+            <i class="fas fa-circle"></i>
+        </button>
+        <button onclick="getCurrentLocation()" title="GPS location">
+            <i class="fas fa-location-crosshairs"></i>
+        </button>
+        <button onclick="togglePanel()" title="More tools">
+            <i class="fas fa-sliders-h"></i>
+        </button>
+    </div>
     
     <!-- Hidden file input for import -->
     <input type="file" id="fileInput" style="display: none;" accept=".geojson,.json">
@@ -253,6 +311,8 @@
         let locationMarker;
         let locationCircle;
         let watchId;
+        let hasCenteredOnLocation = false;
+        let recenterOnNextFix = false;
         let layers = [];
         let selectedLayer = null;
         
@@ -467,69 +527,77 @@
         }
         
         function getCurrentLocation() {
-            if (navigator.geolocation) {
-                // Clear existing watch
-                if (watchId) {
-                    navigator.geolocation.clearWatch(watchId);
-                }
-                
-                // Watch position for continuous updates
-                watchId = navigator.geolocation.watchPosition(
-                    (position) => {
-                        const lat = position.coords.latitude;
-                        const lng = position.coords.longitude;
-                        const accuracy = position.coords.accuracy;
-                        
-                        // Update coordinates display
-                        document.getElementById('latDisplay').textContent = lat.toFixed(6);
-                        document.getElementById('lngDisplay').textContent = lng.toFixed(6);
-                        document.getElementById('accuracyDisplay').textContent = accuracy.toFixed(0);
-                        
-                        // Update or create location marker
-                        if (locationMarker) {
-                            locationMarker.setLatLng([lat, lng]);
-                            locationCircle.setLatLng([lat, lng]);
-                            locationCircle.setRadius(accuracy);
-                        } else {
-                            locationMarker = L.marker([lat, lng], {
-                                icon: L.divIcon({
-                                    className: 'custom-div-icon',
-                                    html: '<div style="background: #4285F4; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-                                    iconSize: [12, 12],
-                                    iconAnchor: [6, 6]
-                                })
-                            }).addTo(map);
-                            
-                            locationCircle = L.circle([lat, lng], {
-                                radius: accuracy,
-                                color: '#4285F4',
-                                fillColor: '#4285F4',
-                                fillOpacity: 0.15,
-                                weight: 1
-                            }).addTo(map);
-                            
-                            locationMarker.bindPopup('Your Location');
-                        }
-                        
-                        // Pan to location on first fix
-                        if (!map.once) {
-                            map.setView([lat, lng], 18);
-                            map.once = true;
-                        }
-                    },
-                    (error) => {
-                        console.error('Location error:', error);
-                        alert('Unable to get location. Please check GPS settings.');
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 5000,
-                        maximumAge: 0
-                    }
-                );
-            } else {
+            if (!navigator.geolocation) {
                 alert('Geolocation is not supported by this browser.');
+                return;
             }
+
+            // When user taps the GPS button explicitly, force recentre on next fix
+            recenterOnNextFix = true;
+
+            // Start or restart watchPosition for continuous updates
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+            }
+
+            watchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+
+                    // Update coordinates display
+                    document.getElementById('latDisplay').textContent = lat.toFixed(6);
+                    document.getElementById('lngDisplay').textContent = lng.toFixed(6);
+                    document.getElementById('accuracyDisplay').textContent = accuracy.toFixed(0);
+
+                    // Update or create location marker
+                    if (locationMarker) {
+                        locationMarker.setLatLng([lat, lng]);
+                        locationCircle.setLatLng([lat, lng]);
+                        locationCircle.setRadius(accuracy);
+                    } else {
+                        locationMarker = L.marker([lat, lng], {
+                            icon: L.divIcon({
+                                className: 'custom-div-icon',
+                                html: '<div style="background: #4285F4; width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.4);"></div>',
+                                iconSize: [14, 14],
+                                iconAnchor: [7, 7]
+                            })
+                        }).addTo(map);
+
+                        locationCircle = L.circle([lat, lng], {
+                            radius: accuracy,
+                            color: '#4285F4',
+                            fillColor: '#4285F4',
+                            fillOpacity: 0.15,
+                            weight: 1
+                        }).addTo(map);
+
+                        locationMarker.bindPopup('Your Location');
+                    }
+
+                    // Auto-center once on initial load OR when user requested re-center
+                    if (!hasCenteredOnLocation || recenterOnNextFix) {
+                        hasCenteredOnLocation = true;
+                        recenterOnNextFix = false;
+                        map.setView([lat, lng], 18, { animate: true });
+                    }
+                },
+                (error) => {
+                    console.error('Location error:', error);
+                    let message = 'Unable to get location.';
+                    if (error.code === 1) message = 'Location permission denied. Please allow GPS access in your browser.';
+                    else if (error.code === 2) message = 'Position unavailable. Try moving to an open area with better GPS visibility.';
+                    else if (error.code === 3) message = 'Location request timed out. Please try again.';
+                    alert(message);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
         }
         
         function updateCoordinates(e) {
@@ -562,7 +630,14 @@
         }
         
         function togglePanel() {
-            document.getElementById('toolPanel').classList.toggle('collapsed');
+            const panel = document.getElementById('toolPanel');
+            panel.classList.toggle('collapsed');
+            // Give the CSS transition time, then invalidate map size for proper rendering
+            setTimeout(() => {
+                if (map) {
+                    map.invalidateSize();
+                }
+            }, 310);
         }
         
         function editLayers() {
@@ -678,8 +753,22 @@
         }
         
         // Initialize map when page loads
-        document.addEventListener('DOMContentLoaded', initMap);
-        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Start with the tool panel collapsed for more map space on mobile
+            const panel = document.getElementById('toolPanel');
+            if (panel) {
+                panel.classList.add('collapsed');
+            }
+            initMap();
+        });
+
+        // Make sure map resizes correctly on window resize / orientation changes
+        window.addEventListener('resize', () => {
+            if (map) {
+                setTimeout(() => map.invalidateSize(), 200);
+            }
+        });
+
         // Handle offline functionality
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(e => console.log('SW registration failed'));
