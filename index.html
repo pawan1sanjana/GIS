@@ -32,49 +32,6 @@
             padding: 8px;
         }
         
-        .tool-panel {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            padding: 15px;
-            z-index: 1000;
-            max-height: 50vh;
-            overflow-y: auto;
-            transition: transform 0.3s ease;
-        }
-        
-        .tool-panel.collapsed {
-            transform: translateY(calc(100% - 60px));
-        }
-        
-        .panel-handle {
-            width: 50px;
-            height: 4px;
-            background: #cbd5e1;
-            border-radius: 2px;
-            margin: 0 auto 10px;
-        }
-        
-        .info-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            padding: 15px;
-            color: white;
-            margin-bottom: 15px;
-        }
-        
-        .measurement-display {
-            background: #f3f4f6;
-            border-radius: 8px;
-            padding: 10px;
-            margin: 10px 0;
-        }
-        
         .tool-btn {
             transition: all 0.2s;
         }
@@ -86,6 +43,7 @@
         .tool-btn.active {
             background: #4f46e5;
             color: white;
+            border-color: #4f46e5;
         }
         
         .coordinates-display {
@@ -93,201 +51,333 @@
             top: 10px;
             right: 10px;
             background: white;
-            padding: 10px;
+            padding: 8px;
             border-radius: 8px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             z-index: 1000;
-            font-size: 12px;
+            font-size: 11px;
+            max-width: 120px;
+            pointer-events: none;
         }
         
         .layer-item {
-            padding: 8px;
-            border-radius: 6px;
+            padding: 10px;
+            border-radius: 8px;
             background: #f9fafb;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 1px solid #e5e7eb;
         }
 
-        .bottom-bar {
+        /* Bottom Bar Styles */
+        .bottom-nav {
             position: fixed;
-            bottom: 12px;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 2000;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 65px;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-btn {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 10px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-btn i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .nav-btn.active {
+            color: #4f46e5;
+        }
+
+        .tool-tray {
+            position: fixed;
+            bottom: 80px; /* Above bottom nav */
+            left: 10px;
+            right: 10px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 16px;
+            z-index: 1500;
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .tool-tray.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .measurement-pill {
+            position: fixed;
+            top: 60px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 9999px;
-            padding: 6px 10px;
-            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.35);
-            z-index: 1100;
+            backdrop-filter: blur(4px);
+            padding: 8px 16px;
+            border-radius: 50px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
             display: flex;
-            gap: 4px;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            border: 1px solid rgba(0,0,0,0.05);
+            pointer-events: none; /* Allow clicking map through it if needed, but usually we want to read it */
+            white-space: nowrap;
+        }
+
+        .measurement-pill span {
+            display: flex;
             align-items: center;
         }
 
-        .bottom-bar button {
-            width: 40px;
-            height: 40px;
-            border-radius: 9999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f3f4f6;
-            color: #111827;
-            border: none;
+        .measurement-pill i {
+            margin-right: 6px;
+            color: #4f46e5;
         }
 
-        .bottom-bar button:active {
-            transform: scale(0.95);
-        }
-
-        .bottom-bar button.primary {
-            background: #4f46e5;
-            color: #ffffff;
+        /* Mobile improvements */
+        .touch-manipulation {
+            touch-action: manipulation;
         }
         
-        @media (min-width: 768px) {
-            .tool-panel {
-                max-width: 400px;
-                right: auto;
-            }
+        .no-select {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .location-btn-active {
+            color: #4f46e5 !important;
+        }
+
+        .location-btn-follow {
+            color: #4f46e5 !important;
+            background-color: #e0e7ff !important;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1) !important;
         }
     </style>
 </head>
-<body class="overflow-hidden">
+<body class="overflow-hidden touch-manipulation">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="spinner mb-4"></div>
+        <div class="text-gray-700 font-medium">Locating...</div>
+        <div class="text-xs text-gray-500 mt-2">Waiting for GPS signal</div>
+    </div>
+
     <!-- Map Container -->
-    <div id="map"></div>
+    <div id="map" class="touch-manipulation"></div>
     
     <!-- Coordinates Display -->
     <div class="coordinates-display" id="coordsDisplay">
-        <div class="font-semibold text-gray-700 mb-1">GPS Location</div>
-        <div class="text-xs text-gray-600">
-            <div>Lat: <span id="latDisplay">-</span></div>
-            <div>Lng: <span id="lngDisplay">-</span></div>
-            <div>Accuracy: <span id="accuracyDisplay">-</span>m</div>
+        <div class="font-semibold text-gray-700 mb-1 text-[10px] uppercase tracking-wider">GPS Data</div>
+        <div class="text-[10px] text-gray-600 font-mono">
+            <div><span class="text-gray-400">Lat:</span> <span id="latDisplay" class="font-semibold">-</span></div>
+            <div><span class="text-gray-400">Lng:</span> <span id="lngDisplay" class="font-semibold">-</span></div>
+            <div><span class="text-gray-400">Acc:</span> <span id="accuracyDisplay" class="font-semibold">-</span>m</div>
         </div>
     </div>
     
-    <!-- Top Controls -->
-    <div class="fixed top-10 left-10 z-[1000] flex gap-2">
-        <button onclick="toggleBaseMap()" class="bg-white p-3 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+    <!-- Measurement Floating Pill -->
+    <div id="measurementPill" class="measurement-pill hidden">
+        <span id="measureAreaBox" class="border-r border-gray-300 pr-3 mr-3">
+            <i class="fas fa-vector-square"></i>
+            <span id="areaValue">0 m²</span>
+        </span>
+        <span id="measureDistBox">
+            <i class="fas fa-ruler-combined"></i>
+            <span id="perimeterValue">0 m</span>
+        </span>
+    </div>
+
+    <!-- Top Controls (Moved slightly) -->
+    <div class="fixed top-4 left-4 z-[1000] flex flex-col gap-2 no-select">
+        <button onclick="toggleBaseMap()" class="bg-white w-10 h-10 rounded-lg shadow-md flex items-center justify-center active:bg-gray-50 tool-btn">
             <i class="fas fa-layer-group text-gray-700"></i>
         </button>
-        <button onclick="getCurrentLocation()" class="bg-white p-3 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-            <i class="fas fa-location-crosshairs text-gray-700"></i>
+        <button onclick="toggleLocationFollow()" id="locationBtn" class="bg-white w-10 h-10 rounded-lg shadow-md flex items-center justify-center active:bg-gray-50 tool-btn location-btn-active">
+            <i class="fas fa-location-crosshairs"></i>
         </button>
-        <button onclick="toggleFullscreen()" class="bg-white p-3 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+        <button onclick="toggleFullscreen()" class="bg-white w-10 h-10 rounded-lg shadow-md flex items-center justify-center active:bg-gray-50 tool-btn">
             <i class="fas fa-expand text-gray-700"></i>
         </button>
     </div>
     
-    <!-- Tool Panel -->
-    <div class="tool-panel" id="toolPanel">
-        <div class="panel-handle" onclick="togglePanel()"></div>
-        
-        <!-- Info Card -->
-        <div class="info-card">
-            <h2 class="text-lg font-bold mb-1">LandMapper GIS</h2>
-            <p class="text-sm opacity-90">Professional Land Surveying Tool</p>
-            <div class="mt-3 flex gap-4 text-xs">
-                <div>
-                    <i class="fas fa-draw-polygon mr-1"></i>
-                    <span id="parcelCount">0</span> Parcels
-                </div>
-                <div>
-                    <i class="fas fa-ruler mr-1"></i>
-                    <span id="totalArea">0</span> m²
-                </div>
-            </div>
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <button onclick="toggleTray('draw')" class="nav-btn" id="nav-draw">
+            <i class="fas fa-pen-to-square"></i>
+            <span>Draw</span>
+        </button>
+        <button onclick="toggleTray('layers')" class="nav-btn" id="nav-layers">
+            <i class="fas fa-list-ul"></i>
+            <span>Layers</span>
+        </button>
+        <button onclick="toggleTray('data')" class="nav-btn" id="nav-data">
+            <i class="fas fa-database"></i>
+            <span>Data</span>
+        </button>
+        <button onclick="toggleTray('info')" class="nav-btn" id="nav-info">
+            <i class="fas fa-circle-info"></i>
+            <span>Info</span>
+        </button>
+    </div>
+
+    <!-- Drawing Tray -->
+    <div id="drawTray" class="tool-tray">
+        <div class="flex justify-between items-center mb-3">
+            <h3 class="font-bold text-gray-800">Drawing Tools</h3>
+            <button onclick="closeTrays()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
         </div>
-        
-        <!-- Drawing Tools -->
-        <div class="mb-4">
-            <h3 class="font-semibold text-gray-700 mb-2">Drawing Tools</h3>
-            <div class="grid grid-cols-4 gap-2">
-                <button onclick="startDrawing('polygon')" class="tool-btn p-3 bg-gray-100 rounded-lg hover:bg-gray-200" id="polygonBtn">
-                    <i class="fas fa-draw-polygon text-lg"></i>
-                    <div class="text-xs mt-1">Polygon</div>
-                </button>
-                <button onclick="startDrawing('polyline')" class="tool-btn p-3 bg-gray-100 rounded-lg hover:bg-gray-200" id="polylineBtn">
-                    <i class="fas fa-route text-lg"></i>
-                    <div class="text-xs mt-1">Line</div>
-                </button>
-                <button onclick="startDrawing('marker')" class="tool-btn p-3 bg-gray-100 rounded-lg hover:bg-gray-200" id="markerBtn">
-                    <i class="fas fa-map-marker-alt text-lg"></i>
-                    <div class="text-xs mt-1">Marker</div>
-                </button>
-                <button onclick="startDrawing('circle')" class="tool-btn p-3 bg-gray-100 rounded-lg hover:bg-gray-200" id="circleBtn">
-                    <i class="fas fa-circle text-lg"></i>
-                    <div class="text-xs mt-1">Circle</div>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Measurement Display -->
-        <div class="measurement-display" id="measurementDisplay" style="display: none;">
-            <h4 class="font-semibold text-gray-700 mb-2">Measurements</h4>
-            <div class="text-sm text-gray-600">
-                <div class="flex justify-between mb-1">
-                    <span>Area:</span>
-                    <span id="areaValue" class="font-medium">-</span>
+        <div class="grid grid-cols-4 gap-3">
+            <button onclick="startDrawing('polygon')" class="flex flex-col items-center p-2 bg-gray-50 rounded-xl active:bg-blue-50 transition-colors tool-btn" id="polygonBtn">
+                <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-1">
+                    <i class="fas fa-draw-polygon"></i>
                 </div>
-                <div class="flex justify-between mb-1">
-                    <span>Perimeter:</span>
-                    <span id="perimeterValue" class="font-medium">-</span>
+                <span class="text-xs font-medium text-gray-600">Area</span>
+            </button>
+            <button onclick="startDrawing('polyline')" class="flex flex-col items-center p-2 bg-gray-50 rounded-xl active:bg-blue-50 transition-colors tool-btn" id="polylineBtn">
+                <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-1">
+                    <i class="fas fa-route"></i>
                 </div>
-                <div class="flex justify-between">
-                    <span>Center:</span>
-                    <span id="centerValue" class="font-medium text-xs">-</span>
+                <span class="text-xs font-medium text-gray-600">Line</span>
+            </button>
+            <button onclick="startDrawing('marker')" class="flex flex-col items-center p-2 bg-gray-50 rounded-xl active:bg-blue-50 transition-colors tool-btn" id="markerBtn">
+                <div class="w-10 h-10 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-1">
+                    <i class="fas fa-map-marker-alt"></i>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Action Buttons -->
-        <div class="grid grid-cols-2 gap-2 mt-4">
-            <button onclick="editLayers()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                <i class="fas fa-edit mr-2"></i>Edit
+                <span class="text-xs font-medium text-gray-600">Point</span>
             </button>
-            <button onclick="deleteLayers()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
-                <i class="fas fa-trash mr-2"></i>Delete
-            </button>
-            <button onclick="exportData()" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                <i class="fas fa-download mr-2"></i>Export
-            </button>
-            <button onclick="importData()" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
-                <i class="fas fa-upload mr-2"></i>Import
+            <button onclick="startDrawing('circle')" class="flex flex-col items-center p-2 bg-gray-50 rounded-xl active:bg-blue-50 transition-colors tool-btn" id="circleBtn">
+                <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-1">
+                    <i class="fas fa-circle"></i>
+                </div>
+                <span class="text-xs font-medium text-gray-600">Circle</span>
             </button>
         </div>
-        
-        <!-- Layers List -->
-        <div class="mt-4">
-            <h3 class="font-semibold text-gray-700 mb-2">Layers</h3>
-            <div id="layersList" class="max-h-32 overflow-y-auto">
-                <p class="text-sm text-gray-500">No layers added yet</p>
+        <div class="mt-3 pt-3 border-t border-gray-100 grid grid-cols-2 gap-3">
+            <button onclick="editLayers()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium active:bg-gray-200">
+                <i class="fas fa-pen mr-2"></i>Edit Mode
+            </button>
+             <button onclick="deleteLayers()" class="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium active:bg-red-100">
+                <i class="fas fa-trash mr-2"></i>Clear All
+            </button>
+        </div>
+    </div>
+
+    <!-- Layers Tray -->
+    <div id="layersTray" class="tool-tray">
+        <div class="flex justify-between items-center mb-3">
+            <h3 class="font-bold text-gray-800">Layers</h3>
+            <div class="text-xs text-gray-500"><span id="parcelCount">0</span> features</div>
+            <button onclick="closeTrays()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="layersList" class="max-h-48 overflow-y-auto -mx-2 px-2">
+            <div class="flex flex-col items-center justify-center py-8 text-gray-400">
+                <i class="fas fa-layer-group text-2xl mb-2"></i>
+                <span class="text-sm">No layers yet</span>
             </div>
         </div>
     </div>
 
-    <!-- Compact Bottom Bar -->
-    <div class="bottom-bar">
-        <button class="primary" onclick="startDrawing('polygon')" title="Draw polygon">
-            <i class="fas fa-draw-polygon"></i>
-        </button>
-        <button onclick="startDrawing('polyline')" title="Draw line">
-            <i class="fas fa-route"></i>
-        </button>
-        <button onclick="startDrawing('marker')" title="Add marker">
-            <i class="fas fa-map-marker-alt"></i>
-        </button>
-        <button onclick="startDrawing('circle')" title="Draw circle">
-            <i class="fas fa-circle"></i>
-        </button>
-        <button onclick="getCurrentLocation()" title="GPS location">
-            <i class="fas fa-location-crosshairs"></i>
-        </button>
-        <button onclick="togglePanel()" title="More tools">
-            <i class="fas fa-sliders-h"></i>
-        </button>
+    <!-- Data Tray -->
+    <div id="dataTray" class="tool-tray">
+        <div class="flex justify-between items-center mb-3">
+            <h3 class="font-bold text-gray-800">Data Management</h3>
+            <button onclick="closeTrays()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="exportData()" class="p-4 bg-gray-50 rounded-xl flex flex-col items-center active:bg-blue-50 border border-transparent active:border-blue-200 transition-all">
+                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-2">
+                    <i class="fas fa-file-export text-xl"></i>
+                </div>
+                <span class="font-medium text-gray-700">Export</span>
+                <span class="text-xs text-gray-500">Save as GeoJSON</span>
+            </button>
+            <button onclick="importData()" class="p-4 bg-gray-50 rounded-xl flex flex-col items-center active:bg-purple-50 border border-transparent active:border-purple-200 transition-all">
+                <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-2">
+                    <i class="fas fa-file-import text-xl"></i>
+                </div>
+                <span class="font-medium text-gray-700">Import</span>
+                <span class="text-xs text-gray-500">Load GeoJSON</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Info Tray -->
+    <div id="infoTray" class="tool-tray">
+        <div class="flex justify-between items-center mb-3">
+            <h3 class="font-bold text-gray-800">Project Info</h3>
+            <button onclick="closeTrays()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-4 text-white shadow-lg mb-3">
+            <div class="text-xs opacity-80 uppercase tracking-wider mb-1">Total Area</div>
+            <div class="text-3xl font-bold" id="totalArea">0 m²</div>
+        </div>
+        <div class="text-xs text-gray-500 text-center">
+            LandMapper GIS v1.0
+        </div>
     </div>
     
     <!-- Hidden file input for import -->
@@ -311,21 +401,25 @@
         let locationMarker;
         let locationCircle;
         let watchId;
-        let hasCenteredOnLocation = false;
-        let recenterOnNextFix = false;
         let layers = [];
         let selectedLayer = null;
+        let followUser = true;
+        let isUserInteracting = false;
+        let lastPosition = null;
         
         // Base layers
         const baseLayers = {
             osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
             }),
             satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: '© Esri'
+                attribution: '© Esri',
+                maxZoom: 19
             }),
             terrain: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenTopoMap'
+                attribution: '© OpenTopoMap',
+                maxZoom: 17
             })
         };
         
@@ -334,7 +428,8 @@
             map = L.map('map', {
                 center: [0, 0],
                 zoom: 2,
-                zoomControl: false
+                zoomControl: false,
+                tap: true // Enable tap support for mobile
             });
             
             // Add zoom control to bottom right
@@ -366,10 +461,46 @@
             map.on('mousemove', updateCoordinates);
             map.on('click', handleMapClick);
             
+            // Detect user interaction to pause following
+            map.on('dragstart', () => {
+                if (followUser) {
+                    followUser = false;
+                    updateLocationButtonState();
+                }
+            });
+            
+            // Sync initial button state
+            updateLocationButtonState();
+            
             // Get user location on start
-            getCurrentLocation();
+            startLocationTracking();
         }
         
+        function toggleTray(trayName) {
+            // Close all trays first
+            const allTrays = document.querySelectorAll('.tool-tray');
+            const allNavBtns = document.querySelectorAll('.nav-btn');
+            
+            let targetTray = document.getElementById(trayName + 'Tray');
+            let targetBtn = document.getElementById('nav-' + trayName);
+            
+            const wasActive = targetTray.classList.contains('active');
+            
+            // Reset
+            allTrays.forEach(t => t.classList.remove('active'));
+            allNavBtns.forEach(b => b.classList.remove('active'));
+            
+            if (!wasActive) {
+                targetTray.classList.add('active');
+                targetBtn.classList.add('active');
+            }
+        }
+        
+        function closeTrays() {
+            document.querySelectorAll('.tool-tray').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        }
+
         function handleDrawCreated(e) {
             const layer = e.layer;
             const type = e.layerType;
@@ -406,7 +537,15 @@
             `);
             
             updateUI();
+            
+            // We keep drawing active for consecutive actions or close? 
+            // Usually users want to draw multiple points, but for polygons maybe one is enough.
+            // Let's reset for cleaner UI on mobile
             deactivateDrawing();
+            
+            // Show measurements immediately but don't hide the tray necessarily
+            // Actually, let's hide the tray to see the map better
+            closeTrays();
         }
         
         function handleDrawEdited(e) {
@@ -428,11 +567,12 @@
                 layers = layers.filter(l => l.id !== layerId);
             });
             updateUI();
-            document.getElementById('measurementDisplay').style.display = 'none';
+            document.getElementById('measurementPill').classList.add('hidden');
         }
         
         function handleMapClick(e) {
-            // Handle map clicks for selection
+            // Close trays when clicking the map to ensure full view
+            closeTrays();
         }
         
         function calculatePolygonMeasurements(layer) {
@@ -443,9 +583,8 @@
             const polygon = turf.polygon([coordinates]);
             const area = turf.area(polygon);
             const perimeter = turf.length(turf.lineString(coordinates), {units: 'meters'}) * 1000;
-            const center = turf.centroid(polygon);
             
-            displayMeasurements(area, perimeter, center.geometry.coordinates);
+            displayMeasurements(area, perimeter);
         }
         
         function calculateLineMeasurements(layer) {
@@ -454,41 +593,36 @@
             
             const line = turf.lineString(coordinates);
             const length = turf.length(line, {units: 'meters'}) * 1000;
-            const center = turf.center(line);
             
-            displayMeasurements(null, length, center.geometry.coordinates);
+            displayMeasurements(null, length);
         }
         
         function calculateCircleMeasurements(layer) {
-            const center = layer.getLatLng();
             const radius = layer.getRadius();
             const area = Math.PI * radius * radius;
             const perimeter = 2 * Math.PI * radius;
             
-            displayMeasurements(area, perimeter, [center.lng, center.lat]);
+            displayMeasurements(area, perimeter);
         }
         
-        function displayMeasurements(area, perimeter, center) {
-            const display = document.getElementById('measurementDisplay');
-            display.style.display = 'block';
+        function displayMeasurements(area, perimeter) {
+            const pill = document.getElementById('measurementPill');
+            pill.classList.remove('hidden');
+            
+            const areaBox = document.getElementById('measureAreaBox');
+            const distBox = document.getElementById('measureDistBox');
             
             if (area !== null) {
+                areaBox.style.display = 'inline-flex';
                 document.getElementById('areaValue').textContent = 
                     area > 10000 ? `${(area / 10000).toFixed(2)} ha` : `${area.toFixed(2)} m²`;
             } else {
-                document.getElementById('areaValue').textContent = '-';
+                areaBox.style.display = 'none';
             }
             
             if (perimeter !== null) {
                 document.getElementById('perimeterValue').textContent = 
                     perimeter > 1000 ? `${(perimeter / 1000).toFixed(2)} km` : `${perimeter.toFixed(2)} m`;
-            } else {
-                document.getElementById('perimeterValue').textContent = '-';
-            }
-            
-            if (center) {
-                document.getElementById('centerValue').textContent = 
-                    `${center[1].toFixed(6)}, ${center[0].toFixed(6)}`;
             }
         }
         
@@ -499,105 +633,171 @@
             switch(type) {
                 case 'polygon':
                     drawHandler = new L.Draw.Polygon(map, drawControl.options.draw.polygon);
-                    document.getElementById('polygonBtn').classList.add('active');
+                    document.getElementById('polygonBtn').classList.add('bg-blue-100', 'border-blue-200');
                     break;
                 case 'polyline':
                     drawHandler = new L.Draw.Polyline(map, drawControl.options.draw.polyline);
-                    document.getElementById('polylineBtn').classList.add('active');
+                    document.getElementById('polylineBtn').classList.add('bg-blue-100', 'border-blue-200');
                     break;
                 case 'marker':
                     drawHandler = new L.Draw.Marker(map, drawControl.options.draw.marker);
-                    document.getElementById('markerBtn').classList.add('active');
+                    document.getElementById('markerBtn').classList.add('bg-blue-100', 'border-blue-200');
                     break;
                 case 'circle':
                     drawHandler = new L.Draw.Circle(map, drawControl.options.draw.circle);
-                    document.getElementById('circleBtn').classList.add('active');
+                    document.getElementById('circleBtn').classList.add('bg-blue-100', 'border-blue-200');
                     break;
             }
             
             if (drawHandler) {
                 drawHandler.enable();
+                // Close tray so user can see map
+                closeTrays();
             }
         }
         
         function deactivateDrawing() {
             document.querySelectorAll('.tool-btn').forEach(btn => {
-                btn.classList.remove('active');
+                btn.classList.remove('bg-blue-100', 'border-blue-200');
             });
         }
         
-        function getCurrentLocation() {
-            if (!navigator.geolocation) {
-                alert('Geolocation is not supported by this browser.');
-                return;
-            }
-
-            // When user taps the GPS button explicitly, force recentre on next fix
-            recenterOnNextFix = true;
-
-            // Start or restart watchPosition for continuous updates
-            if (watchId) {
-                navigator.geolocation.clearWatch(watchId);
-            }
-
-            watchId = navigator.geolocation.watchPosition(
-                (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    const accuracy = position.coords.accuracy;
-
-                    // Update coordinates display
-                    document.getElementById('latDisplay').textContent = lat.toFixed(6);
-                    document.getElementById('lngDisplay').textContent = lng.toFixed(6);
-                    document.getElementById('accuracyDisplay').textContent = accuracy.toFixed(0);
-
-                    // Update or create location marker
-                    if (locationMarker) {
-                        locationMarker.setLatLng([lat, lng]);
-                        locationCircle.setLatLng([lat, lng]);
-                        locationCircle.setRadius(accuracy);
-                    } else {
-                        locationMarker = L.marker([lat, lng], {
-                            icon: L.divIcon({
-                                className: 'custom-div-icon',
-                                html: '<div style="background: #4285F4; width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.4);"></div>',
-                                iconSize: [14, 14],
-                                iconAnchor: [7, 7]
-                            })
-                        }).addTo(map);
-
-                        locationCircle = L.circle([lat, lng], {
-                            radius: accuracy,
-                            color: '#4285F4',
-                            fillColor: '#4285F4',
-                            fillOpacity: 0.15,
-                            weight: 1
-                        }).addTo(map);
-
-                        locationMarker.bindPopup('Your Location');
-                    }
-
-                    // Auto-center once on initial load OR when user requested re-center
-                    if (!hasCenteredOnLocation || recenterOnNextFix) {
-                        hasCenteredOnLocation = true;
-                        recenterOnNextFix = false;
-                        map.setView([lat, lng], 18, { animate: true });
-                    }
-                },
-                (error) => {
-                    console.error('Location error:', error);
-                    let message = 'Unable to get location.';
-                    if (error.code === 1) message = 'Location permission denied. Please allow GPS access in your browser.';
-                    else if (error.code === 2) message = 'Position unavailable. Try moving to an open area with better GPS visibility.';
-                    else if (error.code === 3) message = 'Location request timed out. Please try again.';
-                    alert(message);
-                },
-                {
+        function startLocationTracking() {
+            if (navigator.geolocation) {
+                // Clear existing watch
+                if (watchId) {
+                    navigator.geolocation.clearWatch(watchId);
+                }
+                
+                const options = {
                     enableHighAccuracy: true,
                     timeout: 10000,
                     maximumAge: 0
+                };
+
+                // Attempt to get initial position quickly
+                navigator.geolocation.getCurrentPosition(
+                    updatePosition, 
+                    handleLocationError, 
+                    options
+                );
+                
+                // Watch position for continuous updates
+                watchId = navigator.geolocation.watchPosition(
+                    updatePosition,
+                    handleLocationError,
+                    options
+                );
+            } else {
+                alert('Geolocation is not supported by this browser.');
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        function updatePosition(position) {
+            // Hide loading overlay once we have a position
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay && loadingOverlay.style.display !== 'none') {
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 300);
+            }
+
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+            
+            lastPosition = [lat, lng];
+            
+            // Update coordinates display
+            document.getElementById('latDisplay').textContent = lat.toFixed(6);
+            document.getElementById('lngDisplay').textContent = lng.toFixed(6);
+            document.getElementById('accuracyDisplay').textContent = accuracy.toFixed(0);
+            
+            // Update or create location marker
+            if (locationMarker) {
+                locationMarker.setLatLng([lat, lng]);
+                locationCircle.setLatLng([lat, lng]);
+                locationCircle.setRadius(accuracy);
+            } else {
+                locationMarker = L.marker([lat, lng], {
+                    icon: L.divIcon({
+                        className: 'custom-div-icon',
+                        html: '<div style="background: #4285F4; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transform: translate(-2px, -2px);"></div>',
+                        iconSize: [16, 16],
+                        iconAnchor: [8, 8]
+                    }),
+                    zIndexOffset: 1000
+                }).addTo(map);
+                
+                locationCircle = L.circle([lat, lng], {
+                    radius: accuracy,
+                    color: '#4285F4',
+                    fillColor: '#4285F4',
+                    fillOpacity: 0.1,
+                    weight: 1
+                }).addTo(map);
+            }
+            
+            // Auto-center map if follow mode is active
+            if (followUser) {
+                // If it's the very first fix (zoom is low), zoom in
+                if (map.getZoom() < 10) {
+                    map.setView([lat, lng], 18, {
+                        animate: true,
+                        duration: 1
+                    });
+                } else {
+                    map.panTo([lat, lng], {
+                        animate: true,
+                        duration: 0.5
+                    });
                 }
-            );
+            }
+        }
+
+        function handleLocationError(error) {
+            console.error('Location error:', error);
+            // If we are still on the loading screen, allow user to dismiss it
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay && loadingOverlay.style.display !== 'none') {
+                loadingOverlay.innerHTML = `
+                    <div class="text-red-500 font-medium mb-2">Location Error</div>
+                    <div class="text-sm text-gray-600 mb-4 text-center px-4">Unable to acquire GPS signal. Check permissions.</div>
+                    <button onclick="document.getElementById('loadingOverlay').style.display='none'" class="px-4 py-2 bg-gray-200 rounded-lg text-sm">Dismiss</button>
+                `;
+            }
+        }
+
+        function toggleLocationFollow() {
+            if (!lastPosition) {
+                alert('Waiting for GPS signal...');
+                return;
+            }
+
+            if (followUser) {
+                // If already following, just re-center
+                map.setView(lastPosition, 18);
+            } else {
+                // Enable follow mode
+                followUser = true;
+                map.setView(lastPosition, 18);
+            }
+            updateLocationButtonState();
+        }
+        
+        function updateLocationButtonState() {
+            const btn = document.getElementById('locationBtn');
+            if (followUser) {
+                btn.classList.add('location-btn-follow');
+                btn.classList.remove('location-btn-active');
+                btn.innerHTML = '<i class="fas fa-location-arrow"></i>'; // Change icon to arrow when following
+            } else {
+                btn.classList.remove('location-btn-follow');
+                btn.classList.add('location-btn-active');
+                btn.innerHTML = '<i class="fas fa-location-crosshairs"></i>'; // Crosshairs when not following
+            }
         }
         
         function updateCoordinates(e) {
@@ -629,16 +829,7 @@
             }
         }
         
-        function togglePanel() {
-            const panel = document.getElementById('toolPanel');
-            panel.classList.toggle('collapsed');
-            // Give the CSS transition time, then invalidate map size for proper rendering
-            setTimeout(() => {
-                if (map) {
-                    map.invalidateSize();
-                }
-            }, 310);
-        }
+
         
         function editLayers() {
             if (drawControl._map) {
@@ -653,7 +844,7 @@
                 drawnItems.clearLayers();
                 layers = [];
                 updateUI();
-                document.getElementById('measurementDisplay').style.display = 'none';
+                document.getElementById('measurementPill').classList.add('hidden');
             }
         }
         
@@ -741,34 +932,27 @@
             // Update layers list
             const layersList = document.getElementById('layersList');
             if (layers.length === 0) {
-                layersList.innerHTML = '<p class="text-sm text-gray-500">No layers added yet</p>';
+                layersList.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-8 text-gray-400">
+                        <i class="fas fa-layer-group text-2xl mb-2"></i>
+                        <span class="text-sm">No layers yet</span>
+                    </div>`;
             } else {
                 layersList.innerHTML = layers.map(layer => `
-                    <div class="layer-item">
-                        <span class="text-sm font-medium">${layer.name}</span>
-                        <span class="text-xs text-gray-500">${layer.type}</span>
+                    <div class="layer-item bg-gray-50 p-3 rounded-lg mb-2 flex justify-between items-center border border-gray-100">
+                        <div>
+                            <div class="text-sm font-medium text-gray-800">${layer.name}</div>
+                            <div class="text-xs text-gray-500">${new Date(layer.timestamp).toLocaleTimeString()}</div>
+                        </div>
+                        <span class="text-xs px-2 py-1 bg-white border rounded text-gray-600 font-mono">${layer.type}</span>
                     </div>
                 `).join('');
             }
         }
         
         // Initialize map when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            // Start with the tool panel collapsed for more map space on mobile
-            const panel = document.getElementById('toolPanel');
-            if (panel) {
-                panel.classList.add('collapsed');
-            }
-            initMap();
-        });
-
-        // Make sure map resizes correctly on window resize / orientation changes
-        window.addEventListener('resize', () => {
-            if (map) {
-                setTimeout(() => map.invalidateSize(), 200);
-            }
-        });
-
+        document.addEventListener('DOMContentLoaded', initMap);
+        
         // Handle offline functionality
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(e => console.log('SW registration failed'));
