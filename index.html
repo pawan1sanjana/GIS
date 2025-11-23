@@ -3,894 +3,687 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#3b82f6">
-    <meta name="description" content="Professional GPS-enabled land mapping tool for accurate boundary tracking on mobile devices">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHBhdGggZD0iTTc2IDQ0SDUyVjg0SDc2Wk00NCA2OEwyNyA4MUwzMiA4NUw0NCA2OE02NCA0NEM2NCAzMC4zIDQ5LjYgMjAgMzcgMjRIMzdDMjguNCAyOSAjMjIgMi4yIDIyIDVDMjIgMTAuMyAyOC4zIDE2IDM3IDE2IDQ4LjA1IDE2IDUzMSAxNiA1MSAyMSA3My43IDI2IDEwMCAyNSBDMTI3IDI5LjMgMTI3KDI0IDM2Yy0xLTIgMC42LTMgMS44LTQgMi45LTQuMi40LTQgOC40LTcgMTMuMyAxMmMxNC4zIDAgMjYuNiAxMi42IDIyIDUgMjNONjcgMTA2UzcyLjUgOTMgNTYgOTFMMjQgNzhDNy4xIDc0IDAgNjQuMyAwIDU0VjIyQzAgOS43IDcuMSA0NCA0NCA0NEg0MCUxODkgNzNDNjUgNTguOCA2NCA0OC44IDY0IDQ0VjIyWiIgc3Ryb2tlPSIjMzI5OUYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0iIzMyOTlGIi8+Cjwvc3ZnPg==">
-    <title>Land Mapping GPS Tracker - Mobile Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>LandMapper GIS - Mobile Land Mapping App</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Leaflet Draw CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        #map { height: 100vh; width: 100%; touch-action: pan-x pan-y; }
-        .leaflet-control-container .leaflet-top { z-index: 400; }
-        
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.7); }
-        
-        * { 
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-            -webkit-tap-highlight-color: transparent;
+        #map {
+            height: 100vh;
+            width: 100%;
+            position: relative;
+            z-index: 0;
         }
         
-        .glass {
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+        .leaflet-control-custom {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            padding: 8px;
         }
         
-        @keyframes pulse-ring {
-            0% { transform: scale(0.95); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.7; }
-            100% { transform: scale(0.95); opacity: 1; }
-        }
-        .pulse-animate { animation: pulse-ring 2s ease-in-out infinite; }
-
-        @keyframes ripple {
-            0% { transform: scale(0.8); opacity: 1; }
-            100% { transform: scale(2.5); opacity: 0; }
-        }
-        .ripple-effect::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            background: currentColor;
-            opacity: 0;
-            animation: ripple 0.6s ease-out;
-        }
-
-        .dark body { background-color: #0f172a; }
-        .dark #map { filter: brightness(0.9); }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .control-panel {
+        .tool-panel {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            z-index: 500;
-            transition: transform 0.3s ease-out;
-            max-height: 80vh;
+            background: white;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            padding: 15px;
+            z-index: 1000;
+            max-height: 50vh;
             overflow-y: auto;
+            transition: transform 0.3s ease;
         }
-
-        .control-panel.minimized {
+        
+        .tool-panel.collapsed {
             transform: translateY(calc(100% - 60px));
         }
-
-        .drag-handle {
-            width: 48px;
+        
+        .panel-handle {
+            width: 50px;
             height: 4px;
-            background: rgba(156, 163, 175, 0.5);
+            background: #cbd5e1;
             border-radius: 2px;
-            margin: 0 auto 12px;
-            cursor: grab;
+            margin: 0 auto 10px;
         }
-
-        .btn-large {
-            min-height: 56px;
-            font-size: 1.125rem;
+        
+        .info-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            margin-bottom: 15px;
         }
-
-        @media (max-width: 640px) {
-            .notification {
-                top: 10px;
-                right: 10px;
-                left: 10px;
-                max-width: none;
+        
+        .measurement-display {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .tool-btn {
+            transition: all 0.2s;
+        }
+        
+        .tool-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .tool-btn.active {
+            background: #4f46e5;
+            color: white;
+        }
+        
+        .coordinates-display {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            font-size: 12px;
+        }
+        
+        .layer-item {
+            padding: 8px;
+            border-radius: 6px;
+            background: #f9fafb;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        @media (min-width: 768px) {
+            .tool-panel {
+                max-width: 400px;
+                right: auto;
             }
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-slate-900">
-    
-    <!-- Theme Toggle & Menu -->
-    <div class="absolute top-4 right-4 z-[600] flex gap-2">
-        <button id="menuToggle" class="p-3 rounded-full glass bg-white/80 dark:bg-gray-800/80 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
-            <svg class="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-        </button>
-        <button id="themeToggle" class="p-3 rounded-full glass bg-white/80 dark:bg-gray-800/80 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
-            <svg id="sunIcon" class="w-6 h-6 text-yellow-500 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            <svg id="moonIcon" class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
-        </button>
-    </div>
-
-    <!-- GPS Accuracy Indicator -->
-    <div id="accuracyBadge" class="absolute top-4 left-4 z-[600] glass bg-white/90 dark:bg-gray-800/90 rounded-xl shadow-lg px-4 py-2 hidden">
-        <div class="flex items-center gap-2">
-            <div class="w-2 h-2 rounded-full pulse-animate" id="accuracyDot"></div>
-            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300" id="accuracyText">--</span>
-        </div>
-    </div>
-
-    <!-- Main Control Panel (Bottom Sheet) -->
-    <div id="controlPanel" class="control-panel">
-        <div class="glass bg-white/95 dark:bg-gray-800/95 rounded-t-3xl shadow-2xl p-5 border-t border-white/20 dark:border-gray-700/50">
-            
-            <div class="drag-handle"></div>
-            
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
-                            Land Mapper Pro
-                        </h1>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Mobile Edition</p>
-                    </div>
-                </div>
-                <button id="togglePanel" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <svg id="panelUpIcon" class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </button>
-            </div>
-            
-            <div class="flex gap-2 mb-4 p-1 bg-gray-100 dark:bg-gray-700/50 rounded-xl">
-                <button id="gpsMode" class="flex-1 py-3 px-4 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold shadow-lg transform transition-all duration-200 active:scale-95 flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    GPS Walk
-                </button>
-                <button id="tapMode" class="flex-1 py-3 px-4 rounded-lg bg-transparent text-gray-700 dark:text-gray-300 font-semibold transition-all duration-200 active:scale-95 hover:bg-white/50 dark:hover:bg-gray-600/50 flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-                    </svg>
-                    Tap Points
-                </button>
-            </div>
-
-            <!-- GPS Controls -->
-            <div id="gpsControls" class="space-y-3">
-                <div class="flex gap-2">
-                    <button id="startGPS" class="flex-1 btn-large py-4 px-4 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold shadow-lg hover:shadow-xl transform active:scale-95 transition-all duration-200 flex items-center justify-center gap-2">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Start GPS Tracking
-                    </button>
-                    <button id="autoFollowToggle" class="p-4 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 shadow-md transition-all duration-200 active:scale-95" title="Auto-follow GPS">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                    </button>
-                </div>
-                <button id="stopGPS" class="w-full btn-large py-4 px-4 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white font-semibold shadow-lg hover:shadow-xl transform active:scale-95 transition-all duration-200 hidden flex items-center justify-center gap-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-                    </svg>
-                    Stop Tracking
-                </button>
-                <div id="gpsStatus" class="glass bg-green-50/80 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-3 rounded-xl hidden">
-                    <div class="flex items-center gap-2">
-                        <div class="w-2 h-2 bg-green-500 rounded-full pulse-animate"></div>
-                        <span class="text-sm font-medium text-green-700 dark:text-green-300">GPS Tracking Active</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tap Controls -->
-            <div id="tapControls" class="space-y-3 hidden">
-                <div class="glass bg-blue-50/80 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 rounded-xl">
-                    <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">Tap to Add Points</p>
-                            <p class="text-xs text-blue-700 dark:text-blue-300">Touch anywhere on the map to mark boundary points</p>
-                        </div>
-                    </div>
-                </div>
-                <button id="undoPoint" class="w-full btn-large py-4 px-4 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-600 text-white font-semibold shadow-lg hover:shadow-xl transform active:scale-95 transition-all duration-200 flex items-center justify-center gap-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                    </svg>
-                    Undo Last Point
-                </button>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="mt-4 space-y-2">
-                <div class="grid grid-cols-2 gap-2">
-                    <button id="clearMap" class="btn-large py-3 px-4 rounded-xl bg-gray-600 dark:bg-gray-700 text-white font-semibold hover:bg-gray-700 dark:hover:bg-gray-600 shadow-md hover:shadow-lg transform active:scale-95 transition-all duration-200 flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        Clear
-                    </button>
-                    <button id="completePolygon" class="btn-large py-3 px-4 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 text-white font-semibold shadow-md hover:shadow-lg transform active:scale-95 transition-all duration-200 flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Complete
-                    </button>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <button id="calculateArea" class="btn-large py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold shadow-md hover:shadow-lg transform active:scale-95 transition-all duration-200 flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                        Area
-                    </button>
-                    <button id="saveBoundary" class="btn-large py-3 px-4 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-semibold shadow-md hover:shadow-lg transform active:scale-95 transition-all duration-200 flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                        </svg>
-                        Save
-                    </button>
-                </div>
-            </div>
-
-            <!-- Stats -->
-            <div class="mt-4 grid grid-cols-3 gap-2">
-                <div class="glass bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-3 rounded-xl border border-blue-200/50 dark:border-blue-800/50">
-                    <div class="flex flex-col items-center">
-                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        </svg>
-                        <span class="text-xs text-gray-600 dark:text-gray-400 mb-0.5">Points</span>
-                        <span id="pointCount" class="text-lg font-bold text-gray-800 dark:text-white">0</span>
-                    </div>
-                </div>
-                <div class="glass bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-3 rounded-xl border border-green-200/50 dark:border-green-800/50">
-                    <div class="flex flex-col items-center">
-                        <svg class="w-5 h-5 text-green-600 dark:text-green-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                        </svg>
-                        <span class="text-xs text-gray-600 dark:text-gray-400 mb-0.5">Area</span>
-                        <span id="areaDisplay" class="text-xs font-bold text-gray-800 dark:text-white">-- m²</span>
-                    </div>
-                </div>
-                <div class="glass bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-3 rounded-xl border border-purple-200/50 dark:border-purple-800/50">
-                    <div class="flex flex-col items-center">
-                        <svg class="w-5 h-5 text-purple-600 dark:text-purple-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
-                        <span class="text-xs text-gray-600 dark:text-gray-400 mb-0.5">Distance</span>
-                        <span id="distanceDisplay" class="text-xs font-bold text-gray-800 dark:text-white">-- m</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+<body class="overflow-hidden">
+    <!-- Map Container -->
     <div id="map"></div>
-
-    <script>
-        // Mobile-specific utilities
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        let wakeLock = null;
-
-        // Vibration feedback
-        function vibrate(pattern = 50) {
-            if ('vibrate' in navigator && isMobile) {
-                navigator.vibrate(pattern);
-            }
-        }
-
-        // Screen wake lock for GPS tracking
-        async function requestWakeLock() {
-            try {
-                if ('wakeLock' in navigator) {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                    console.log('Wake lock acquired');
-                }
-            } catch (err) {
-                console.log('Wake lock failed:', err);
-            }
-        }
-
-        function releaseWakeLock() {
-            if (wakeLock) {
-                wakeLock.release();
-                wakeLock = null;
-                console.log('Wake lock released');
-            }
-        }
-
-        // PWA Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => {
-                        console.log('Service Worker registered successfully:', reg);
-                    })
-                    .catch(err => {
-                        console.log('Service Worker registration failed:', err);
-                    });
-            });
-        }
-
-        // Theme Management
-        const html = document.documentElement;
-        const themeToggle = document.getElementById('themeToggle');
-        const sunIcon = document.getElementById('sunIcon');
-        const moonIcon = document.getElementById('moonIcon');
+    
+    <!-- Coordinates Display -->
+    <div class="coordinates-display" id="coordsDisplay">
+        <div class="font-semibold text-gray-700 mb-1">GPS Location</div>
+        <div class="text-xs text-gray-600">
+            <div>Lat: <span id="latDisplay">-</span></div>
+            <div>Lng: <span id="lngDisplay">-</span></div>
+            <div>Accuracy: <span id="accuracyDisplay">-</span>m</div>
+        </div>
+    </div>
+    
+    <!-- Top Controls -->
+    <div class="fixed top-10 left-10 z-[1000] flex gap-2">
+        <button onclick="toggleBaseMap()" class="bg-white p-3 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+            <i class="fas fa-layer-group text-gray-700"></i>
+        </button>
+        <button onclick="getCurrentLocation()" class="bg-white p-3 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+            <i class="fas fa-location-crosshairs text-gray-700"></i>
+        </button>
+        <button onclick="toggleFullscreen()" class="bg-white p-3 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+            <i class="fas fa-expand text-gray-700"></i>
+        </button>
+    </div>
+    
+    <!-- Tool Panel -->
+    <div class="tool-panel" id="toolPanel">
+        <div class="panel-handle" onclick="togglePanel()"></div>
         
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        if (currentTheme === 'dark') {
-            html.classList.add('dark');
-            sunIcon.classList.remove('hidden');
-            moonIcon.classList.add('hidden');
-        }
-
-        themeToggle.addEventListener('click', () => {
-            vibrate(30);
-            html.classList.toggle('dark');
-            const isDark = html.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            
-            if (isDark) {
-                sunIcon.classList.remove('hidden');
-                moonIcon.classList.add('hidden');
-            } else {
-                sunIcon.classList.add('hidden');
-                moonIcon.classList.remove('hidden');
-            }
-        });
-
-        // Panel toggle functionality
-        const controlPanel = document.getElementById('controlPanel');
-        const togglePanelBtn = document.getElementById('togglePanel');
-        const panelUpIcon = document.getElementById('panelUpIcon');
-        let isPanelMinimized = false;
-
-        togglePanelBtn.addEventListener('click', () => {
-            vibrate(30);
-            isPanelMinimized = !isPanelMinimized;
-            controlPanel.classList.toggle('minimized', isPanelMinimized);
-            panelUpIcon.style.transform = isPanelMinimized ? 'rotate(180deg)' : 'rotate(0)';
-        });
-
-        // Drag to minimize panel
-        let touchStartY = 0;
-        let touchEndY = 0;
-        const dragHandle = document.querySelector('.drag-handle');
-
-        dragHandle.addEventListener('touchstart', (e) => {
-            touchStartY = e.touches[0].clientY;
-        }, { passive: true });
-
-        dragHandle.addEventListener('touchmove', (e) => {
-            touchEndY = e.touches[0].clientY;
-            const diff = touchEndY - touchStartY;
-            if (diff > 50 && !isPanelMinimized) {
-                isPanelMinimized = true;
-                controlPanel.classList.add('minimized');
-                panelUpIcon.style.transform = 'rotate(180deg)';
-                vibrate(30);
-            } else if (diff < -50 && isPanelMinimized) {
-                isPanelMinimized = false;
-                controlPanel.classList.remove('minimized');
-                panelUpIcon.style.transform = 'rotate(0)';
-                vibrate(30);
-            }
-        }, { passive: true });
-
-        // Initialize map
-        const map = L.map('map', {
-            tap: true,
-            tapTolerance: 15
-        }).setView([7.8731, 80.7718], 13);
-        
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Esri',
-            maxZoom: 20
-        }).addTo(map);
-
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 20
-        }).addTo(map);
-
-        // State management
-        let currentMode = 'gps';
-        let isTracking = false;
-        let autoFollow = true;
-        let watchId = null;
-        let boundaryPoints = [];
-        let markers = [];
-        let polyline = null;
-        let polygon = null;
-        let currentLocationMarker = null;
-        let totalDistance = 0;
-
-        // UI Elements
-        const gpsModeBtn = document.getElementById('gpsMode');
-        const tapModeBtn = document.getElementById('tapMode');
-        const gpsControls = document.getElementById('gpsControls');
-        const tapControls = document.getElementById('tapControls');
-        const startGPSBtn = document.getElementById('startGPS');
-        const stopGPSBtn = document.getElementById('stopGPS');
-        const autoFollowToggle = document.getElementById('autoFollowToggle');
-        const gpsStatus = document.getElementById('gpsStatus');
-        const undoPointBtn = document.getElementById('undoPoint');
-        const clearMapBtn = document.getElementById('clearMap');
-        const completePolygonBtn = document.getElementById('completePolygon');
-        const calculateAreaBtn = document.getElementById('calculateArea');
-        const saveBoundaryBtn = document.getElementById('saveBoundary');
-        const pointCountEl = document.getElementById('pointCount');
-        const areaDisplayEl = document.getElementById('areaDisplay');
-        const distanceDisplayEl = document.getElementById('distanceDisplay');
-        const accuracyBadge = document.getElementById('accuracyBadge');
-        const accuracyText = document.getElementById('accuracyText');
-        const accuracyDot = document.getElementById('accuracyDot');
-
-        // Notification system
-        function showNotification(message, type = 'info', duration = 3000) {
-            const notification = document.createElement('div');
-            notification.className = `notification glass ${
-                type === 'error' ? 'bg-red-500' : 
-                type === 'success' ? 'bg-green-500' : 
-                'bg-blue-500'
-            } text-white`;
-            notification.innerHTML = `
-                <div class="flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>${message}</span>
+        <!-- Info Card -->
+        <div class="info-card">
+            <h2 class="text-lg font-bold mb-1">LandMapper GIS</h2>
+            <p class="text-sm opacity-90">Professional Land Surveying Tool</p>
+            <div class="mt-3 flex gap-4 text-xs">
+                <div>
+                    <i class="fas fa-draw-polygon mr-1"></i>
+                    <span id="parcelCount">0</span> Parcels
                 </div>
-            `;
-            document.body.appendChild(notification);
-            vibrate(type === 'error' ? [50, 50, 50] : 50);
-            setTimeout(() => notification.remove(), duration);
-        }
-
-        // Auto-follow toggle
-        autoFollowToggle.addEventListener('click', () => {
-            autoFollow = !autoFollow;
-            vibrate(30);
-            if (autoFollow) {
-                autoFollowToggle.classList.remove('bg-gray-200', 'dark:bg-gray-700');
-                autoFollowToggle.classList.add('bg-blue-500', 'text-white');
-                showNotification('Auto-follow enabled', 'success');
-            } else {
-                autoFollowToggle.classList.remove('bg-blue-500', 'text-white');
-                autoFollowToggle.classList.add('bg-gray-200', 'dark:bg-gray-700');
-                showNotification('Auto-follow disabled', 'info');
-            }
-        });
-
-        // Set initial auto-follow state
-        autoFollowToggle.classList.add('bg-blue-500', 'text-white');
-
-        // Mode switching
-        gpsModeBtn.addEventListener('click', () => {
-            vibrate(30);
-            currentMode = 'gps';
-            gpsModeBtn.classList.remove('bg-transparent', 'text-gray-700', 'dark:text-gray-300');
-            gpsModeBtn.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-indigo-600', 'text-white', 'shadow-lg');
-            tapModeBtn.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-indigo-600', 'text-white', 'shadow-lg');
-            tapModeBtn.classList.add('bg-transparent', 'text-gray-700', 'dark:text-gray-300');
-            gpsControls.classList.remove('hidden');
-            tapControls.classList.add('hidden');
-            map.off('click');
-        });
-
-        tapModeBtn.addEventListener('click', () => {
-            vibrate(30);
-            currentMode = 'tap';
-            tapModeBtn.classList.remove('bg-transparent', 'text-gray-700', 'dark:text-gray-300');
-            tapModeBtn.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-indigo-600', 'text-white', 'shadow-lg');
-            gpsModeBtn.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-indigo-600', 'text-white', 'shadow-lg');
-            gpsModeBtn.classList.add('bg-transparent', 'text-gray-700', 'dark:text-gray-300');
-            tapControls.classList.remove('hidden');
-            gpsControls.classList.add('hidden');
-            
-            if (isTracking) {
-                stopGPSTracking();
-            }
-            
-            enableTapMode();
-        });
-
-        // GPS Tracking
-        startGPSBtn.addEventListener('click', startGPSTracking);
-        stopGPSBtn.addEventListener('click', stopGPSTracking);
-
-        function startGPSTracking() {
-            if (!navigator.geolocation) {
-                showNotification('Geolocation is not supported by your device', 'error');
-                return;
-            }
-
-            vibrate([50, 100, 50]);
-            isTracking = true;
-            startGPSBtn.classList.add('hidden');
-            stopGPSBtn.classList.remove('hidden');
-            stopGPSBtn.style.display = 'flex';
-            gpsStatus.classList.remove('hidden');
-            accuracyBadge.classList.remove('hidden');
-            
-            requestWakeLock();
-
-            watchId = navigator.geolocation.watchPosition(
-                (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    const accuracy = position.coords.accuracy;
-
-                    if (currentLocationMarker) {
-                        currentLocationMarker.setLatLng([lat, lng]);
-                    } else {
-                        currentLocationMarker = L.circleMarker([lat, lng], {
-                            radius: 10,
-                            fillColor: '#3b82f6',
-                            color: '#fff',
-                            weight: 4,
-                            fillOpacity: 1
-                        }).addTo(map);
-                    }
-
-                    // Filter by accuracy (only add points with good accuracy)
-                    if (accuracy <= 30) {
-                        addBoundaryPoint(lat, lng);
-                        accuracyDot.style.backgroundColor = '#10b981';
-                    } else if (accuracy <= 50) {
-                        accuracyDot.style.backgroundColor = '#f59e0b';
-                    } else {
-                        accuracyDot.style.backgroundColor = '#ef4444';
-                    }
-
-                    accuracyText.textContent = `±${Math.round(accuracy)}m`;
-                    
-                    if (autoFollow) {
-                        map.setView([lat, lng], Math.max(map.getZoom(), 18), {
-                            animate: true,
-                            duration: 0.5
-                        });
-                    }
-                },
-                (error) => {
-                    console.error('GPS Error:', error);
-                    showNotification('GPS error: ' + error.message, 'error');
-                },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
-                }
-            );
-        }
-
-        function stopGPSTracking() {
-            if (watchId) {
-                navigator.geolocation.clearWatch(watchId);
-                watchId = null;
-            }
-            vibrate([50, 100, 50]);
-            isTracking = false;
-            startGPSBtn.classList.remove('hidden');
-            stopGPSBtn.classList.add('hidden');
-            gpsStatus.classList.add('hidden');
-            accuracyBadge.classList.add('hidden');
-            
-            releaseWakeLock();
-        }
-
-        // Tap Mode
-        function enableTapMode() {
-            map.on('click', (e) => {
-                if (currentMode === 'tap') {
-                    addBoundaryPoint(e.latlng.lat, e.latlng.lng);
-                }
+                <div>
+                    <i class="fas fa-ruler mr-1"></i>
+                    <span id="totalArea">0</span> m²
+                </div>
+            </div>
+        </div>
+        
+        <!-- Drawing Tools -->
+        <div class="mb-4">
+            <h3 class="font-semibold text-gray-700 mb-2">Drawing Tools</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <button onclick="startDrawing('polygon')" class="tool-btn p-3 bg-gray-100 rounded-lg hover:bg-gray-200" id="polygonBtn">
+                    <i class="fas fa-draw-polygon text-lg"></i>
+                    <div class="text-xs mt-1">Polygon</div>
+                </button>
+                <button onclick="startDrawing('polyline')" class="tool-btn p-3 bg-gray-100 rounded-lg hover:bg-gray-200" id="polylineBtn">
+                    <i class="fas fa-route text-lg"></i>
+                    <div class="text-xs mt-1">Line</div>
+                </button>
+                <button onclick="startDrawing('marker')" class="tool-btn p-3 bg-gray-100 rounded-lg hover:bg-gray-200" id="markerBtn">
+                    <i class="fas fa-map-marker-alt text-lg"></i>
+                    <div class="text-xs mt-1">Marker</div>
+                </button>
+                <button onclick="startDrawing('circle')" class="tool-btn p-3 bg-gray-100 rounded-lg hover:bg-gray-200" id="circleBtn">
+                    <i class="fas fa-circle text-lg"></i>
+                    <div class="text-xs mt-1">Circle</div>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Measurement Display -->
+        <div class="measurement-display" id="measurementDisplay" style="display: none;">
+            <h4 class="font-semibold text-gray-700 mb-2">Measurements</h4>
+            <div class="text-sm text-gray-600">
+                <div class="flex justify-between mb-1">
+                    <span>Area:</span>
+                    <span id="areaValue" class="font-medium">-</span>
+                </div>
+                <div class="flex justify-between mb-1">
+                    <span>Perimeter:</span>
+                    <span id="perimeterValue" class="font-medium">-</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Center:</span>
+                    <span id="centerValue" class="font-medium text-xs">-</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-2 gap-2 mt-4">
+            <button onclick="editLayers()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                <i class="fas fa-edit mr-2"></i>Edit
+            </button>
+            <button onclick="deleteLayers()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                <i class="fas fa-trash mr-2"></i>Delete
+            </button>
+            <button onclick="exportData()" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                <i class="fas fa-download mr-2"></i>Export
+            </button>
+            <button onclick="importData()" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
+                <i class="fas fa-upload mr-2"></i>Import
+            </button>
+        </div>
+        
+        <!-- Layers List -->
+        <div class="mt-4">
+            <h3 class="font-semibold text-gray-700 mb-2">Layers</h3>
+            <div id="layersList" class="max-h-32 overflow-y-auto">
+                <p class="text-sm text-gray-500">No layers added yet</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden file input for import -->
+    <input type="file" id="fileInput" style="display: none;" accept=".geojson,.json">
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Leaflet Draw JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    
+    <!-- Turf.js for GIS calculations -->
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+    
+    <script>
+        // Initialize map
+        let map;
+        let drawnItems;
+        let drawControl;
+        let currentBaseLayer = 'osm';
+        let locationMarker;
+        let locationCircle;
+        let watchId;
+        let layers = [];
+        let selectedLayer = null;
+        
+        // Base layers
+        const baseLayers = {
+            osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }),
+            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '© Esri'
+            }),
+            terrain: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenTopoMap'
+            })
+        };
+        
+        function initMap() {
+            // Initialize map
+            map = L.map('map', {
+                center: [0, 0],
+                zoom: 2,
+                zoomControl: false
             });
-        }
-
-        // Calculate distance between two points
-        function calculateDistance(lat1, lng1, lat2, lng2) {
-            const R = 6371000; // Earth's radius in meters
-            const φ1 = lat1 * Math.PI / 180;
-            const φ2 = lat2 * Math.PI / 180;
-            const Δφ = (lat2 - lat1) * Math.PI / 180;
-            const Δλ = (lng2 - lng1) * Math.PI / 180;
-
-            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-                      Math.cos(φ1) * Math.cos(φ2) *
-                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-            return R * c;
-        }
-
-        // Add boundary point
-        function addBoundaryPoint(lat, lng) {
-            // Calculate distance from previous point
-            if (boundaryPoints.length > 0) {
-                const prev = boundaryPoints[boundaryPoints.length - 1];
-                const dist = calculateDistance(prev[0], prev[1], lat, lng);
-                totalDistance += dist;
-            }
-
-            boundaryPoints.push([lat, lng]);
-            vibrate(50);
-
-            const marker = L.circleMarker([lat, lng], {
-                radius: 8,
-                fillColor: '#ef4444',
-                color: '#fff',
-                weight: 3,
-                fillOpacity: 1,
-                className: 'pulse-animate'
+            
+            // Add zoom control to bottom right
+            L.control.zoom({
+                position: 'bottomright'
             }).addTo(map);
             
-            marker.bindPopup(`
-                <div class="text-center p-2">
-                    <strong class="text-blue-600">Point ${boundaryPoints.length}</strong><br>
-                    <span class="text-xs text-gray-600">Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}</span>
+            // Add default base layer
+            baseLayers.osm.addTo(map);
+            
+            // Initialize drawn items layer
+            drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+            
+            // Initialize draw control
+            drawControl = new L.Control.Draw({
+                draw: false,
+                edit: {
+                    featureGroup: drawnItems,
+                    remove: true,
+                    edit: true
+                }
+            });
+            
+            // Map event handlers
+            map.on('draw:created', handleDrawCreated);
+            map.on('draw:edited', handleDrawEdited);
+            map.on('draw:deleted', handleDrawDeleted);
+            map.on('mousemove', updateCoordinates);
+            map.on('click', handleMapClick);
+            
+            // Get user location on start
+            getCurrentLocation();
+        }
+        
+        function handleDrawCreated(e) {
+            const layer = e.layer;
+            const type = e.layerType;
+            
+            drawnItems.addLayer(layer);
+            
+            // Add to layers list
+            const layerId = L.stamp(layer);
+            const layerInfo = {
+                id: layerId,
+                type: type,
+                layer: layer,
+                name: `${type.charAt(0).toUpperCase() + type.slice(1)} ${layers.length + 1}`,
+                timestamp: new Date().toISOString()
+            };
+            
+            layers.push(layerInfo);
+            
+            // Calculate measurements
+            if (type === 'polygon' || type === 'rectangle') {
+                calculatePolygonMeasurements(layer);
+            } else if (type === 'polyline') {
+                calculateLineMeasurements(layer);
+            } else if (type === 'circle') {
+                calculateCircleMeasurements(layer);
+            }
+            
+            // Add popup
+            layer.bindPopup(`
+                <div class="p-2">
+                    <strong>${layerInfo.name}</strong><br>
+                    <small>Created: ${new Date(layerInfo.timestamp).toLocaleString()}</small>
                 </div>
             `);
-            markers.push(marker);
-
-            if (polyline) {
-                map.removeLayer(polyline);
-            }
-            polyline = L.polyline(boundaryPoints, {
-                color: '#3b82f6',
-                weight: 4,
-                opacity: 0.8
-            }).addTo(map);
-
-            updateStats();
+            
+            updateUI();
+            deactivateDrawing();
         }
-
-        // Undo last point
-        undoPointBtn.addEventListener('click', () => {
-            if (boundaryPoints.length > 0) {
-                vibrate([50, 30, 50]);
-                
-                // Recalculate total distance
-                if (boundaryPoints.length >= 2) {
-                    const lastTwo = boundaryPoints.slice(-2);
-                    const dist = calculateDistance(lastTwo[0][0], lastTwo[0][1], lastTwo[1][0], lastTwo[1][1]);
-                    totalDistance -= dist;
+        
+        function handleDrawEdited(e) {
+            e.layers.eachLayer(function(layer) {
+                if (layer instanceof L.Polygon || layer instanceof L.Rectangle) {
+                    calculatePolygonMeasurements(layer);
+                } else if (layer instanceof L.Polyline) {
+                    calculateLineMeasurements(layer);
+                } else if (layer instanceof L.Circle) {
+                    calculateCircleMeasurements(layer);
                 }
-                
-                boundaryPoints.pop();
-                const lastMarker = markers.pop();
-                if (lastMarker) {
-                    map.removeLayer(lastMarker);
-                }
-                
-                if (polyline) {
-                    map.removeLayer(polyline);
-                }
-                
-                if (boundaryPoints.length > 0) {
-                    polyline = L.polyline(boundaryPoints, {
-                        color: '#3b82f6',
-                        weight: 4,
-                        opacity: 0.8
-                    }).addTo(map);
-                }
-                
-                updateStats();
-                showNotification('Last point removed', 'success');
-            }
-        });
-
-        // Clear map
-        clearMapBtn.addEventListener('click', () => {
-            if (boundaryPoints.length === 0) {
-                showNotification('Map is already empty', 'info');
-                return;
-            }
-            
-            if (confirm('Are you sure you want to clear all points?')) {
-                vibrate([50, 50, 50]);
-                boundaryPoints = [];
-                markers.forEach(m => map.removeLayer(m));
-                markers = [];
-                totalDistance = 0;
-                
-                if (polyline) {
-                    map.removeLayer(polyline);
-                    polyline = null;
-                }
-                if (polygon) {
-                    map.removeLayer(polygon);
-                    polygon = null;
-                }
-                
-                updateStats();
-                showNotification('Map cleared', 'success');
-            }
-        });
-
-        // Complete polygon
-        completePolygonBtn.addEventListener('click', () => {
-            if (boundaryPoints.length < 3) {
-                showNotification('Need at least 3 points to complete polygon', 'error');
-                return;
-            }
-
-            vibrate([50, 100, 50]);
-            
-            if (polygon) {
-                map.removeLayer(polygon);
-            }
-
-            polygon = L.polygon(boundaryPoints, {
-                color: '#3b82f6',
-                fillColor: '#3b82f6',
-                fillOpacity: 0.3,
-                weight: 3
-            }).addTo(map);
-
-            map.fitBounds(polygon.getBounds(), { padding: [50, 50] });
-            showNotification('Polygon completed!', 'success');
-        });
-
-        // Calculate area
-        calculateAreaBtn.addEventListener('click', () => {
-            if (boundaryPoints.length < 3) {
-                showNotification('Need at least 3 points to calculate area', 'error');
-                return;
-            }
-
-            vibrate([50, 100, 50]);
-            const area = calculatePolygonArea(boundaryPoints);
-            areaDisplayEl.textContent = `${area.toFixed(2)} m²`;
-            
-            const acres = (area * 0.000247105).toFixed(4);
-            const hectares = (area * 0.0001).toFixed(4);
-            
-            showNotification(`Area: ${area.toFixed(2)} m² | ${acres} acres | ${hectares} ha`, 'success', 5000);
-        });
-
-        // Save boundary
-        saveBoundaryBtn.addEventListener('click', () => {
-            if (boundaryPoints.length < 3) {
-                showNotification('Need at least 3 points to save', 'error');
-                return;
-            }
-
-            vibrate([50, 100, 50]);
-            const area = calculatePolygonArea(boundaryPoints);
-            const boundary = {
-                points: boundaryPoints,
-                area: area,
-                distance: totalDistance,
-                timestamp: new Date().toISOString(),
-                name: `Boundary ${new Date().toLocaleString()}`
-            };
-
-            const savedBoundaries = JSON.parse(localStorage.getItem('savedBoundaries') || '[]');
-            savedBoundaries.push(boundary);
-            localStorage.setItem('savedBoundaries', JSON.stringify(savedBoundaries));
-
-            showNotification('Boundary saved successfully!', 'success');
-        });
-
-        // Calculate polygon area using Shoelace formula
-        function calculatePolygonArea(points) {
-            if (points.length < 3) return 0;
-
-            const R = 6371000; // Earth's radius in meters
-            let area = 0;
-
-            for (let i = 0; i < points.length; i++) {
-                const p1 = points[i];
-                const p2 = points[(i + 1) % points.length];
-                
-                const lat1 = p1[0] * Math.PI / 180;
-                const lat2 = p2[0] * Math.PI / 180;
-                const lng1 = p1[1] * Math.PI / 180;
-                const lng2 = p2[1] * Math.PI / 180;
-                
-                area += (lng2 - lng1) * (2 + Math.sin(lat1) + Math.sin(lat2));
-            }
-
-            area = Math.abs(area * R * R / 2);
-            return area;
+            });
+            updateUI();
         }
-
-        // Update stats
-        function updateStats() {
-            pointCountEl.textContent = boundaryPoints.length;
+        
+        function handleDrawDeleted(e) {
+            e.layers.eachLayer(function(layer) {
+                const layerId = L.stamp(layer);
+                layers = layers.filter(l => l.id !== layerId);
+            });
+            updateUI();
+            document.getElementById('measurementDisplay').style.display = 'none';
+        }
+        
+        function handleMapClick(e) {
+            // Handle map clicks for selection
+        }
+        
+        function calculatePolygonMeasurements(layer) {
+            const latlngs = layer.getLatLngs()[0];
+            const coordinates = latlngs.map(ll => [ll.lng, ll.lat]);
+            coordinates.push(coordinates[0]); // Close the polygon
             
-            if (boundaryPoints.length >= 3) {
-                const area = calculatePolygonArea(boundaryPoints);
-                areaDisplayEl.textContent = `${area.toFixed(2)} m²`;
+            const polygon = turf.polygon([coordinates]);
+            const area = turf.area(polygon);
+            const perimeter = turf.length(turf.lineString(coordinates), {units: 'meters'}) * 1000;
+            const center = turf.centroid(polygon);
+            
+            displayMeasurements(area, perimeter, center.geometry.coordinates);
+        }
+        
+        function calculateLineMeasurements(layer) {
+            const latlngs = layer.getLatLngs();
+            const coordinates = latlngs.map(ll => [ll.lng, ll.lat]);
+            
+            const line = turf.lineString(coordinates);
+            const length = turf.length(line, {units: 'meters'}) * 1000;
+            const center = turf.center(line);
+            
+            displayMeasurements(null, length, center.geometry.coordinates);
+        }
+        
+        function calculateCircleMeasurements(layer) {
+            const center = layer.getLatLng();
+            const radius = layer.getRadius();
+            const area = Math.PI * radius * radius;
+            const perimeter = 2 * Math.PI * radius;
+            
+            displayMeasurements(area, perimeter, [center.lng, center.lat]);
+        }
+        
+        function displayMeasurements(area, perimeter, center) {
+            const display = document.getElementById('measurementDisplay');
+            display.style.display = 'block';
+            
+            if (area !== null) {
+                document.getElementById('areaValue').textContent = 
+                    area > 10000 ? `${(area / 10000).toFixed(2)} ha` : `${area.toFixed(2)} m²`;
             } else {
-                areaDisplayEl.textContent = '-- m²';
+                document.getElementById('areaValue').textContent = '-';
             }
-
-            if (totalDistance > 1000) {
-                distanceDisplayEl.textContent = `${(totalDistance / 1000).toFixed(2)} km`;
+            
+            if (perimeter !== null) {
+                document.getElementById('perimeterValue').textContent = 
+                    perimeter > 1000 ? `${(perimeter / 1000).toFixed(2)} km` : `${perimeter.toFixed(2)} m`;
             } else {
-                distanceDisplayEl.textContent = `${Math.round(totalDistance)} m`;
+                document.getElementById('perimeterValue').textContent = '-';
+            }
+            
+            if (center) {
+                document.getElementById('centerValue').textContent = 
+                    `${center[1].toFixed(6)}, ${center[0].toFixed(6)}`;
             }
         }
-
-        // Request user location on load
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    map.setView([lat, lng], 15);
-                    showNotification('Location found', 'success');
-                },
-                (error) => {
-                    console.log('Location error:', error);
-                }
-            );
+        
+        function startDrawing(type) {
+            deactivateDrawing();
+            
+            let drawHandler;
+            switch(type) {
+                case 'polygon':
+                    drawHandler = new L.Draw.Polygon(map, drawControl.options.draw.polygon);
+                    document.getElementById('polygonBtn').classList.add('active');
+                    break;
+                case 'polyline':
+                    drawHandler = new L.Draw.Polyline(map, drawControl.options.draw.polyline);
+                    document.getElementById('polylineBtn').classList.add('active');
+                    break;
+                case 'marker':
+                    drawHandler = new L.Draw.Marker(map, drawControl.options.draw.marker);
+                    document.getElementById('markerBtn').classList.add('active');
+                    break;
+                case 'circle':
+                    drawHandler = new L.Draw.Circle(map, drawControl.options.draw.circle);
+                    document.getElementById('circleBtn').classList.add('active');
+                    break;
+            }
+            
+            if (drawHandler) {
+                drawHandler.enable();
+            }
         }
-
-        // Add recenter button
-        const recenterBtn = L.control({ position: 'bottomright' });
-        recenterBtn.onAdd = function() {
-            const btn = L.DomUtil.create('button', 'glass bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 p-3 rounded-full shadow-lg hover:shadow-xl transform active:scale-95 transition-all duration-200 mb-2');
-            btn.innerHTML = `
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-            `;
-            btn.title = 'Center on my location';
-            btn.onclick = function(e) {
-                e.stopPropagation();
-                vibrate(30);
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            map.setView([position.coords.latitude, position.coords.longitude], 18);
-                            showNotification('Centered on your location', 'success');
+        
+        function deactivateDrawing() {
+            document.querySelectorAll('.tool-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+        }
+        
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                // Clear existing watch
+                if (watchId) {
+                    navigator.geolocation.clearWatch(watchId);
+                }
+                
+                // Watch position for continuous updates
+                watchId = navigator.geolocation.watchPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        const accuracy = position.coords.accuracy;
+                        
+                        // Update coordinates display
+                        document.getElementById('latDisplay').textContent = lat.toFixed(6);
+                        document.getElementById('lngDisplay').textContent = lng.toFixed(6);
+                        document.getElementById('accuracyDisplay').textContent = accuracy.toFixed(0);
+                        
+                        // Update or create location marker
+                        if (locationMarker) {
+                            locationMarker.setLatLng([lat, lng]);
+                            locationCircle.setLatLng([lat, lng]);
+                            locationCircle.setRadius(accuracy);
+                        } else {
+                            locationMarker = L.marker([lat, lng], {
+                                icon: L.divIcon({
+                                    className: 'custom-div-icon',
+                                    html: '<div style="background: #4285F4; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+                                    iconSize: [12, 12],
+                                    iconAnchor: [6, 6]
+                                })
+                            }).addTo(map);
+                            
+                            locationCircle = L.circle([lat, lng], {
+                                radius: accuracy,
+                                color: '#4285F4',
+                                fillColor: '#4285F4',
+                                fillOpacity: 0.15,
+                                weight: 1
+                            }).addTo(map);
+                            
+                            locationMarker.bindPopup('Your Location');
                         }
-                    );
+                        
+                        // Pan to location on first fix
+                        if (!map.once) {
+                            map.setView([lat, lng], 18);
+                            map.once = true;
+                        }
+                    },
+                    (error) => {
+                        console.error('Location error:', error);
+                        alert('Unable to get location. Please check GPS settings.');
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+        
+        function updateCoordinates(e) {
+            // Update cursor coordinates (optional - can be removed for mobile)
+        }
+        
+        function toggleBaseMap() {
+            // Cycle through base maps
+            const maps = ['osm', 'satellite', 'terrain'];
+            const currentIndex = maps.indexOf(currentBaseLayer);
+            const nextIndex = (currentIndex + 1) % maps.length;
+            const nextMap = maps[nextIndex];
+            
+            // Remove current layer
+            map.removeLayer(baseLayers[currentBaseLayer]);
+            
+            // Add new layer
+            baseLayers[nextMap].addTo(map);
+            currentBaseLayer = nextMap;
+        }
+        
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
                 }
+            }
+        }
+        
+        function togglePanel() {
+            document.getElementById('toolPanel').classList.toggle('collapsed');
+        }
+        
+        function editLayers() {
+            if (drawControl._map) {
+                map.removeControl(drawControl);
+            } else {
+                map.addControl(drawControl);
+            }
+        }
+        
+        function deleteLayers() {
+            if (confirm('Delete all layers? This cannot be undone.')) {
+                drawnItems.clearLayers();
+                layers = [];
+                updateUI();
+                document.getElementById('measurementDisplay').style.display = 'none';
+            }
+        }
+        
+        function exportData() {
+            if (layers.length === 0) {
+                alert('No layers to export');
+                return;
+            }
+            
+            const geojson = drawnItems.toGeoJSON();
+            geojson.properties = {
+                exported: new Date().toISOString(),
+                layerCount: layers.length
             };
-            return btn;
-        };
-        recenterBtn.addTo(map);
+            
+            const dataStr = JSON.stringify(geojson, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `landmapper_${Date.now()}.geojson`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+        
+        function importData() {
+            document.getElementById('fileInput').click();
+        }
+        
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const geojson = JSON.parse(event.target.result);
+                        L.geoJSON(geojson, {
+                            onEachFeature: function(feature, layer) {
+                                drawnItems.addLayer(layer);
+                                
+                                const layerId = L.stamp(layer);
+                                const layerInfo = {
+                                    id: layerId,
+                                    type: 'imported',
+                                    layer: layer,
+                                    name: `Imported ${layers.length + 1}`,
+                                    timestamp: new Date().toISOString()
+                                };
+                                layers.push(layerInfo);
+                            }
+                        });
+                        
+                        updateUI();
+                        map.fitBounds(drawnItems.getBounds());
+                        alert('Data imported successfully!');
+                    } catch (error) {
+                        alert('Error importing file. Please ensure it is valid GeoJSON.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+        
+        function updateUI() {
+            // Update parcel count
+            document.getElementById('parcelCount').textContent = layers.filter(l => 
+                l.type === 'polygon' || l.type === 'rectangle').length;
+            
+            // Calculate total area
+            let totalArea = 0;
+            drawnItems.eachLayer(function(layer) {
+                if (layer instanceof L.Polygon || layer instanceof L.Rectangle) {
+                    const latlngs = layer.getLatLngs()[0];
+                    const coordinates = latlngs.map(ll => [ll.lng, ll.lat]);
+                    coordinates.push(coordinates[0]);
+                    const polygon = turf.polygon([coordinates]);
+                    totalArea += turf.area(polygon);
+                }
+            });
+            
+            document.getElementById('totalArea').textContent = 
+                totalArea > 10000 ? `${(totalArea / 10000).toFixed(2)} ha` : `${totalArea.toFixed(0)}`;
+            
+            // Update layers list
+            const layersList = document.getElementById('layersList');
+            if (layers.length === 0) {
+                layersList.innerHTML = '<p class="text-sm text-gray-500">No layers added yet</p>';
+            } else {
+                layersList.innerHTML = layers.map(layer => `
+                    <div class="layer-item">
+                        <span class="text-sm font-medium">${layer.name}</span>
+                        <span class="text-xs text-gray-500">${layer.type}</span>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', initMap);
+        
+        // Handle offline functionality
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(e => console.log('SW registration failed'));
+        }
     </script>
 </body>
 </html>
